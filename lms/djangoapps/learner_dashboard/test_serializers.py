@@ -15,7 +15,6 @@ class TestPlatformSettingsSerializer(TestCase):
 
     def test_happy_path(self):
         input_data = {
-            "feedbackEmail": f"{uuid4()}@example.com",
             "supportEmail": f"{uuid4()}@example.com",
             "billingEmail": f"{uuid4()}@example.com",
             "courseSearchUrl": f"{uuid4()}.example.com/search",
@@ -23,7 +22,6 @@ class TestPlatformSettingsSerializer(TestCase):
         output_data = PlatformSettingsSerializer(input_data).data
 
         assert output_data == {
-            "feedbackEmail": input_data["feedbackEmail"],
             "supportEmail": input_data["supportEmail"],
             "billingEmail": input_data["billingEmail"],
             "courseSearchUrl": input_data["courseSearchUrl"],
