@@ -7,7 +7,7 @@ import uuid
 
 import edx_api_doc_tools as apidocs
 from django.contrib.auth import get_user_model
-from django.core.exceptions import BadRequest, ValidationError
+from django.core.exceptions import BadRequest, ValidationError, ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -560,11 +560,11 @@ class LearnerThreadView(APIView):
 
     **Example Requests**:
 
-        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?page=1&page_size=10
+        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?username=edx&page=1&page_size=10
 
     **GET Thread List Parameters**:
 
-        * user_id: (Required) (Integer) ID of the user whose active threads are required
+        * username: (Required) Username of the user whose active threads are required
 
         * page: The (1-indexed) page to retrieve (default is 1)
 
@@ -589,11 +589,9 @@ class LearnerThreadView(APIView):
         page_num = request.GET.get('page', 1)
         threads_per_page = request.GET.get('page_size', 10)
         discussion_id = None
-        try:
-            user_id = int(request.GET.get('user_id', None))
-        except (TypeError, ValueError):
-            return Response({'details': 'Invalid user id'}, status=400)
-
+        username = request.GET.get('username', None)
+        user = get_object_or_404(User, username=username)
+        user_id = int(user.id)
         group_id = None
         try:
             group_id = get_group_id_for_comments_service(request, course_key, discussion_id)
