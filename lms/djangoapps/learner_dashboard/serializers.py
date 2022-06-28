@@ -72,10 +72,6 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     enrollment = EnrollmentSerializer()
     gradeData = GradeDataSerializer()
 
-    # certificate,
-    # entitlements,
-    # programs,
-
 
 class EntitlementSerializer(serializers.Serializer):
     """Serializer for an unfulfilled entitlement"""
