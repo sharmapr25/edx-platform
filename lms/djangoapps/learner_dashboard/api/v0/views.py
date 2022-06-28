@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider
 from openedx.core.djangoapps.programs.utils import (
     ProgramProgressMeter,
     get_certificates,
@@ -15,6 +16,9 @@ from openedx.core.djangoapps.programs.utils import (
     get_program_and_course_data,
     get_program_urls
 )
+from openedx.core.djangoapps.catalog.utils import get_course_data
+from lms.djangoapps.learner_dashboard.api.v0.constant import GENERAL_RECOMMENDATION, API_KEY, AMPLITUDE_URL
+import requests
 
 
 class Programs(APIView):
@@ -335,3 +339,51 @@ class ProgramProgressDetailView(APIView):
                 'credit_pathways': credit_pathways,
             }
         )
+
+
+class CourseRecommendationApiView(APIView):
+
+    # authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    #
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        # course = get_course_data('MITx+6.00.1x')
+        headers = {
+            'Authorization': f'Api-Key {API_KEY}',
+            'Content-Type': 'application/json'
+        }
+        data = []
+
+        request_params = request.GET
+        user_id = request_params.get('user_id')
+        rec_id = request_params.get('rec_id')
+
+        params = {
+            'user_id': user_id,
+            'get_recs': True,
+            'rec_id': rec_id,
+        }
+        try:
+
+            response = requests.get(AMPLITUDE_URL, params=params, headers=headers)
+            if response.status_code == 200:
+                response = response.json()
+                is_control = response['userData']['recommendations'][0]['is_control']
+                if is_control:
+                    return Response(GENERAL_RECOMMENDATION, status=200)
+                # course_ids_list = response['userData']
+                # course_id_list = "HarvardX+CS50x"
+                # course_response= requests.get('https://discovery.edx.org/api/v1/courses/' + course_id_list, headers=discovery_header)
+                # import pdb; pdb.set_trace()
+                # json_result = course_response.json
+
+
+        except Exception as e:
+            pass
+
+        return Response(data, status=200)
+        # if response.status_code == 200:
+        #     response = response.json()
+        #     data = response['userData']['recommendations'][0]['items']
+        #     return Response(data, status=200)
