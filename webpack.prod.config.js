@@ -11,6 +11,7 @@ var commonConfig = require('./webpack.common.config.js');
 
 var optimizedConfig = Merge.smart(commonConfig, {
   web: {
+    mode: 'production',
     output: {
         filename: '[name].[chunkhash].js'
     },

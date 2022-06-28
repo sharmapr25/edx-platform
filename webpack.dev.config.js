@@ -11,6 +11,7 @@ var commonConfig = require('./webpack.common.config.js');
 
 module.exports = _.values(Merge.smart(commonConfig, {
     web: {
+        mode: 'development',
         output: {
             filename: '[name].js'
         },
@@ -38,8 +39,9 @@ module.exports = _.values(Merge.smart(commonConfig, {
                             loader: 'css-loader',
                             options: {
                                 sourceMap: true,
-                                modules: true,
-                                localIdentName: '[name]__[local]'
+                                modules: {
+                                    localIdentName: "[name]__[local]",
+                                },
                             }
                         },
                         {
